@@ -1,0 +1,248 @@
+                                                       ======JAVA=====
+
+
+### Hashing
+
+# Normal Code::::::::
+
+
+class Node {
+    String key;
+    Object value;
+    Node next;
+
+    public Node(String key, Object value, Node next) {
+        this.key = key;
+        this.value = value;
+        this.next = next;
+    }
+}
+
+class HashTableExample {
+    private int size;
+    private Node[] table;
+
+    public HashTableExample(int size) {
+        this.size = size;
+        this.table = new Node[this.size];
+    }
+
+    public HashTableExample() {
+        this(5);
+    }
+
+    private int hashFunction(String key) {
+        int hashValue = 0;
+        for (char ch : key.toCharArray()) {
+            hashValue += (int) ch;
+        }
+        return hashValue % size;
+    }
+
+    public void insert(String key, Object value) {
+    int index = hashFunction(key); // Compute hash index
+
+    // If no chain exists, create a new node
+    if (table[index] == null) {
+        table[index] = new Node(key, value, null);
+        return;
+    }
+
+    // Traverse the chain to check if the key already exists or find the last node
+    Node current = table[index];
+
+    while (true) {
+        if (current.key.equals(key)) {
+            current.value = value; // Update value if key exists
+            return;
+        }
+        if (current.next == null) {
+            break; // Reach the last node
+        }
+        current = current.next;
+    }
+
+    // Append new node at the end
+    current.next = new Node(key, value, null);
+}
+
+
+    public boolean search(String key) {
+    int index = hashFunction(key); // Compute index
+    Node current = table[index]; // Start from the first node in the chain
+
+    while (current != null) {
+        if (current.key.equals(key)) {
+            return true; // Key found
+        }
+        current = current.next; // Move to the next node
+    }
+
+    return false; // Key not found
+}
+
+
+    public void remove(String remKey) {
+    int index = hashFunction(remKey);
+
+    if (table[index] == null) {
+        System.out.println("Key '" + remKey + "' not found.");
+        return;
+    }
+
+    // Case 1: Key is in the first node
+    if (table[index].key.equals(remKey)) {
+        System.out.println("Removed (" + table[index].key + ", " + table[index].value + ")");
+        table[index] = table[index].next; // Move head to the next node
+        return;
+    }
+
+    // Case 2: Traverse the chain to find and remove the node
+    Node predecessor = table[index];
+    Node current = predecessor.next;
+
+    while (current != null) {
+        if (current.key.equals(remKey)) {
+            predecessor.next = current.next; // Bypass the node
+            System.out.println("Removed (" + current.key + ", " + current.value + ")");
+            return;
+        }
+        predecessor = current;
+        current = current.next;
+    }
+
+    System.out.println("Key '" + remKey + "' not found.");
+}
+
+
+    public void printHashTable() {
+    for (int i = 0; i < table.length; i++) {
+        System.out.print(i + ": ");
+        Node current = table[i];
+
+        while (current != null) {
+            System.out.print("(" + current.key + ", " + current.value + ") → ");
+            current = current.next;
+        }
+
+        System.out.println("None"); // End of the linked list
+    }
+    System.out.println();
+  }
+}
+
+public class HashTableTest {
+    public static void main(String[] args) {
+        // Create a hash table with size 5
+        HashTableExample hashTable = new HashTableExample(5);
+
+        // Print the hash table before insertion
+        System.out.println("Hash table before insert:");
+        System.out.println("x".repeat(50));
+        hashTable.printHashTable();
+
+        // Insert data (words) and their corresponding values
+        hashTable.insert("cat", 10);
+        hashTable.insert("dog", 20);
+        hashTable.insert("rat", 40);
+        hashTable.insert("owl", 50);
+        hashTable.insert("fox", 60);
+        hashTable.insert("ant", 70);
+        hashTable.insert("bee", 80);
+
+        // Print the hash table after insertion
+        System.out.println("Hash table after insert:");
+        System.out.println("x".repeat(50));
+        hashTable.printHashTable();
+
+        // Search for keys
+        System.out.println("Hash table before search:");
+        hashTable.printHashTable();
+        System.out.println("x".repeat(50));
+
+        System.out.println("Search for 'rat': " + hashTable.search("rat")); // Expected: true
+        System.out.println("Search for 'owl': " + hashTable.search("owl")); // Expected: true
+        System.out.println("Search for 'hen': " + hashTable.search("hen")); // Expected: false (not inserted)
+
+        System.out.println("Hash table after search:");
+        System.out.println("x".repeat(50));
+        hashTable.printHashTable();
+
+        // Print the hash table before removal
+        System.out.println("x".repeat(50));
+        System.out.println("Hash table before removals:");
+        hashTable.printHashTable();
+
+        // Remove nodes
+        hashTable.remove("cat");
+        hashTable.remove("owl");
+        hashTable.remove("dog");
+
+        // Print the updated hash table after removal
+        System.out.println("\nHash table after removals:");
+        System.out.println("x".repeat(50));
+        hashTable.printHashTable();
+    }
+}
+
+
+
+
+
+
+Output-------------------
+======
+
+Hash table before insert:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+0: None
+1: None
+2: None
+3: None
+4: None
+
+Hash table after insert:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+0: (rat, 40) → None
+1: (owl, 50) → None
+2: (cat, 10) → (fox, 60) → None
+3: (dog, 20) → (ant, 70) → None
+4: (bee, 80) → None
+
+Hash table before search:
+0: (rat, 40) → None
+1: (owl, 50) → None
+2: (cat, 10) → (fox, 60) → None
+3: (dog, 20) → (ant, 70) → None
+4: (bee, 80) → None
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Search for 'rat': true
+Search for 'owl': true
+Search for 'hen': false
+Hash table after search:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+0: (rat, 40) → None
+1: (owl, 50) → None
+2: (cat, 10) → (fox, 60) → None
+3: (dog, 20) → (ant, 70) → None
+4: (bee, 80) → None
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Hash table before removals:
+0: (rat, 40) → None
+1: (owl, 50) → None
+2: (cat, 10) → (fox, 60) → None
+3: (dog, 20) → (ant, 70) → None
+4: (bee, 80) → None
+
+Removed (cat, 10)
+Removed (owl, 50)
+Removed (dog, 20)
+
+Hash table after removals:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+0: (rat, 40) → None
+1: None
+2: (fox, 60) → None
+3: (ant, 70) → None
+4: (bee, 80) → None
